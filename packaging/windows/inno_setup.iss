@@ -1,11 +1,10 @@
 ﻿; Give AppVer and SourceFolder from command line, eg:
 ; "C:\Program Files (x86)\Inno Setup 5\iscc" /dAppVer=1.13 /dSourceFolder=build inno_setup.iss 
-;#define AppVer "9.9.9"
-;#define InstallerPrefix "thonny"
-;#define SourceFolder "C:\workspaces\python_stuff\thonny\packaging\windows\dummy"
+#define AppVer "4.1.4"
+#define InstallerPrefix "thonny-xxl"
+#define SourceFolder "build"
 #define AppUserModelID "Thonny.Thonny"
 #define ThonnyPyProgID "Thonny.py"
-#define SupportedArchitectures "x64 arm64 ia64"
 
 
 [Setup]
@@ -23,11 +22,7 @@ AppUpdatesURL=https://thonny.org
 ; Actual privileges depend on how user started the installer
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=commandline dialog
-
-; Compatibility
-MinVersion=10.0 
-ArchitecturesAllowed={#SupportedArchitectures}
-ArchitecturesInstallIn64BitMode={#SupportedArchitectures}
+MinVersion=6.0
 
 ; Will show important info on welcome page
 DisableWelcomePage=no
@@ -70,7 +65,7 @@ ChangesAssociations=yes
 ; signtool prefix to be configured in Tools => Configure sign tools:
 ; "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe" sign /f CERT.p12 /p PASSWORD $p
 ; NB! Don't forget the trailing $p
-SignTool=signtool /tr http://timestamp.digicert.com /td sha256 /fd sha256 /d $qInstaller for Thonny {#AppVer}$q /du $qhttps://thonny.org$q $f
+; SignTool=signtool /v /tr http://timestamp.digicert.com /td sha256 /fd sha256 /d $qInstaller for Thonny {#AppVer}$q /du $qhttps://thonny.org$q $f
 
 
 [Languages]

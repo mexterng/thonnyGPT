@@ -62,18 +62,6 @@ def clean(
                 "lightcolor": [("selected", normal_detail), ("!selected", frame_background)],
             },
         },
-        "CustomNotebook": {
-            "configure": {
-                "bordercolor": frame_background,
-            }
-        },
-        "CustomNotebook.Tab": {
-            "configure": {
-                "background": frame_background,
-                "activebackground": normal_detail,
-                "indicatorbackground": normal_detail,
-            }
-        },
         "Treeview": {
             "configure": {"background": text_background, "borderwidth": 0, "relief": "flat"},
             "map": {
@@ -224,9 +212,6 @@ def clean(
             "configure": {"background": frame_background},
             "map": {"background": [("disabled", frame_background), ("active", high_detail)]},
         },
-        "CustomToolbutton": {
-            "configure": {"background": frame_background, "activebackground": high_detail}
-        },
         "TLabel": {"configure": {"foreground": normal_foreground}},
         "Url.TLabel": {"configure": {"foreground": normal_foreground}},
         "Tip.TLabel": {"configure": {"foreground": normal_foreground, "background": low_detail}},
@@ -332,7 +317,7 @@ def load_plugin() -> None:
             high_foreground="#eeeeee",
             low_foreground="#666666",
         ),
-        images=dark_images,
+        dark_images,
     )
 
     dark_tip_background = ("#b8c28d",)
@@ -350,7 +335,7 @@ def load_plugin() -> None:
             high_foreground="#eeeeee",
             low_foreground="#5a725b",
         ),
-        images=dark_images,
+        dark_images,
     )
 
     get_workbench().add_ui_theme(
@@ -366,7 +351,7 @@ def load_plugin() -> None:
             high_foreground="#eeeeee",
             low_foreground="#5a5c72",
         ),
-        images=dark_images,
+        dark_images,
     )
 
     get_workbench().add_ui_theme(

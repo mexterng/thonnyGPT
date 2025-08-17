@@ -1430,15 +1430,20 @@ def format_exception_with_frame_info(e_type, e_value, e_traceback, shorten_filen
                         or not isinstance(e_value, SyntaxError)
                     )
                 ):
-                    fmt = "".join(traceback.format_list([entry]))
+                    fmt = '  File "{}", line {}, in {}\n'.format(
+                        entry.filename, entry.lineno, entry.name
+                    )
+
+                    if entry.line:
+                        fmt += "    {}\n".format(entry.line.strip())
+
                     yield (fmt, id(tb_temp.tb_frame), entry.filename, entry.lineno)
 
                 tb_temp = tb_temp.tb_next
 
             assert tb_temp is None  # tb was exhausted
 
-        # using format_exception with limit instead of format_exception_only because latter doesn't give extended info
-        for line in traceback.format_exception(etype, value, tb, limit=0):
+        for line in traceback.format_exception_only(etype, value):
             if etype is SyntaxError and line.endswith("^\n"):
                 # for some reason it may add several empty lines before ^-line
                 partlines = line.splitlines()

@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 
-def run_in_terminal(cmd, cwd, env_overrides={}, keep_open=True):
+def run_in_terminal(cmd, cwd, env_overrides={}, keep_open=True, title=None):
     from thonny.running import get_environment_with_overrides
 
     env = get_environment_with_overrides(env_overrides)
@@ -14,7 +14,7 @@ def run_in_terminal(cmd, cwd, env_overrides={}, keep_open=True):
         cwd = os.getcwd()
 
     if sys.platform == "win32":
-        _run_in_terminal_in_windows(cmd, cwd, env, keep_open)
+        _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title)
     elif sys.platform == "linux":
         _run_in_terminal_in_linux(cmd, cwd, env, keep_open)
     elif sys.platform == "darwin":
@@ -31,7 +31,7 @@ def open_system_shell(cwd, env_overrides={}):
     if sys.platform == "darwin":
         _run_in_terminal_in_macos([], cwd, env_overrides, True)
     elif sys.platform == "win32":
-        cmd = "start " + _get_windows_terminal_command()
+        cmd = "start cmd"
         subprocess.Popen(cmd, cwd=cwd, env=env, shell=True)
     elif sys.platform == "linux":
         cmd = _get_linux_terminal_command()
@@ -54,10 +54,14 @@ def _add_to_path(directory, path):
         return directory + os.pathsep + path
 
 
-def _run_in_terminal_in_windows(cmd, cwd, env, keep_open):
+def _run_in_terminal_in_windows(cmd, cwd, env, keep_open, title=None):
     if keep_open:
-        term_cmd = _get_windows_terminal_command()
-        cmd_line = ["start", term_cmd, "-NoExit", "-Command"] + cmd
+        # Yes, the /K argument has weird quoting. Can't explain this, but it works
+        quoted_args = " ".join(map(lambda s: s if s == "&" else '"' + s + '"', cmd))
+        cmd_line = """start {title} /D "{cwd}" /W cmd /K "{quoted_args}" """.format(
+            cwd=cwd, quoted_args=quoted_args, title='"' + title + '"' if title else ""
+        )
+
         subprocess.Popen(cmd_line, cwd=cwd, env=env, shell=True)
     else:
         subprocess.Popen(cmd, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd=cwd, env=env)
@@ -168,17 +172,6 @@ def _run_in_terminal_in_macos(cmd, cwd, env_overrides, keep_open):
     )
 
     subprocess.Popen(cmd_line, cwd=cwd, shell=True)
-
-
-def _get_windows_terminal_command():
-    import shutil
-
-    if shutil.which("pwsh"):
-        # PowerShell version 6+
-        return "pwsh"
-    else:
-        # Windows PowerShell 5.1
-        return "powershell"
 
 
 def _get_linux_terminal_command():

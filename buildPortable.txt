@@ -1,0 +1,80 @@
+cd .\packaging\windows\
+rd /s /q ".\build"
+mkdir .\build
+@echo ............... COPYING PYTHON ...................................
+xcopy "C:\Program Files\Python\Python310\*" ".\build" /E /I /Y
+
+
+@echo ............... COPYING OTHER STUFF ...................................
+xcopy ".\ThonnyRunner310\x64\Release\thonny.exe" ".\build" /Y
+copy thonny_python.ini .\build
+
+
+@echo ............... INSTALLING DEPS ...................................
+.\build\python -s -m pip install --no-warn-script-location --no-cache-dir wheel
+.\build\python -s -m pip install --no-warn-script-location --no-cache-dir --no-binary mypy -r ..\requirements-regular-bundle.txt
+
+cd ..\..
+python setup.py sdist bdist_wheel
+cd .\packaging\windows\
+ 
+
+@echo ............... INSTALLING THONNY ...................................
+.\build\python -s -m pip install --no-warn-script-location ..\..\dist\thonny-4.1.4.1-py3-none-any.whl
+
+
+@echo ............... CLEANING PYTHON ............................
+move .\build\LICENSE.txt .\build\PYTHON_LICENSE.txt
+move .\build\NEWS.txt .\build\PYTHON_NEWS.txt
+
+@echo Removing unnecessary files...
+del /q /s ".\build\*.pyc"
+del /q /s ".\build\tcl\*.lib"
+del /q /s ".\build\*.a"
+del /q /s ".\build\*.chm"
+
+@echo Removing unnecessary directories...
+rd /s /q ".\build\Doc"
+rd /s /q ".\build\Tools"
+rd /s /q ".\build\Scripts\*"
+rd /s /q ".\build\lib\test"
+rd /s /q ".\build\tcl\tix8.4.3\demos"
+rd /s /q ".\build\tcl\tk8.6\demos"
+rd /s /q ".\build\tcl\tk8.6\msgs"
+rd /s /q ".\build\tcl\tcl8.6\opt0.4"
+rd /s /q ".\build\tcl\tcl8.6\msgs"
+rd /s /q ".\build\tcl\tcl8.6\tzdata"
+rd /s /q ".\build\lib\site-packages\pylint\test"
+rd /s /q ".\build\lib\site-packages\mypy\test"
+
+@echo Removing specific unnecessary files...
+del /q ".\build\tcl\*.sh"
+del /q ".\build\tcl\tcl8.6\clock.tcl"
+del /q ".\build\tcl\tcl8.6\safe.tcl"
+
+@echo Copying pip batch files...
+copy .\pip.bat ".\build\Scripts\pip.bat"
+copy .\pip.bat ".\build\Scripts\pip3.bat"
+copy .\pip.bat ".\build\Scripts\pip3.10.bat"
+
+@echo ............... ADDING LICENSES ...................................
+copy /y "..\..\LICENSE.txt" ".\build"
+mkdir ".\build\licenses"
+xcopy "..\..\licenses\*" ".\build\licenses" /S /E /K >nul 2>&1
+
+@echo ............... ADDING OTHER STUFF ...................................
+copy /y "..\..\CHANGELOG.rst" ".\build" >nul
+copy /y "..\..\CREDITS.rst" ".\build" >nul
+copy /y "..\..\README.rst" ".\build" >nul
+
+@echo ............... BUILDING INSTALLER ...................................
+"C:\Program Files (x86)\Inno Setup 6\iscc.exe" "inno_setup.iss" > "installer_building.log"
+
+@echo ............... CREATING ZIP ..........................
+copy ..\portable_thonny.ini .\build
+cd .\build
+"C:\Program Files\7-Zip\7z.exe" a -tzip "..\dist\thonny-4.1.4-windows-portable.zip" *
+del portable_thonny.ini
+cd ..\..\..
+
+

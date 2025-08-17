@@ -11,7 +11,7 @@ from thonny.languages import tr
 from thonny.memory import MemoryFrame
 from thonny.misc_utils import shorten_repr
 from thonny.tktextext import TextFrame
-from thonny.ui_utils import CustomToolbutton, ems_to_pixels
+from thonny.ui_utils import ems_to_pixels
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ class ObjectInspector(ttk.Frame):
         self.title_label = ttk.Label(
             toolbar,
             style="ViewToolbar.TLabel",
-            text=""
+            text="",
             # borderwidth=1,
             # background=ui_utils.get_main_background()
         )
@@ -93,17 +93,17 @@ class ObjectInspector(ttk.Frame):
         create_tab(6, tr("Attributes"), self.attributes_page)
 
         def create_navigation_link(col, image_filename, action, tooltip, padx=0):
-            button = CustomToolbutton(
+            button = ttk.Button(
                 toolbar,
-                command=action,
-                style="ViewToolbar.CustomToolbutton",
+                # command=handler,
                 image=get_workbench().get_image(image_filename),
+                style="ViewToolbar.Toolbutton",  # TODO: does this cause problems in some Macs?
                 state=tk.NORMAL,
-                pad=ems_to_pixels(0.2),
             )
             ui_utils.create_tooltip(button, tooltip)
 
             button.grid(row=0, column=col, sticky=tk.NE, padx=padx, pady=4)
+            button.bind("<Button-1>", action)
             return button
 
         def configure(event):
@@ -154,14 +154,14 @@ class ObjectInspector(ttk.Frame):
     def _create_attributes_page(self):
         self.attributes_page = AttributesFrame(self)
 
-    def navigate_back(self):
+    def navigate_back(self, event):
         if len(self.back_links) == 0:
             return
 
         self.forward_links.append(self.object_id)
         self._show_object_by_id(self.back_links.pop(), True)
 
-    def navigate_forward(self):
+    def navigate_forward(self, event):
         if len(self.forward_links) == 0:
             return
 

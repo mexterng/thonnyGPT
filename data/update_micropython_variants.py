@@ -12,9 +12,9 @@ from update_variants_common import (
 
 base_url = "https://micropython.org/download/"
 
-UNSTABLE_VERSION = r"\d{8}-v1.22.0-preview-\d+-[a-z0-9]{10}"
-PREV_RELEVANT_VERSION = "1.20.0"
-PREV_RELEVANT_VERSION_IN_URL = "20230426-v1.20.0"
+UNSTABLE_VERSION = r"\d{8}-unstable-v1.20.0-\d+-[a-z0-9]{10}"
+PREV_RELEVANT_VERSION = "1.19.1"
+PREV_RELEVANT_VERSION_IN_URL = "20220618-v1.19.1"
 
 
 class IndexParser(HTMLParser):
@@ -139,7 +139,7 @@ add_defaults_and_downloads_to_variants(
         "info_url": "https://github.com/pimoroni/badger2040/releases",
         "_download_url_pattern": "https://github.com/pimoroni/badger2040/releases/download/v{version}/{id}-v{version}-micropython.uf2",
     },
-    ["0.0.4", "0.0.3"],
+    ["0.0.2"],
     badger_variants,
 )
 
@@ -171,24 +171,20 @@ pimoroni_variants = [
         "model": "Pico W",
     },
     {
-        "_id": "pimoroni-cosmic_unicorn",
+        "_id": "pimoroni-picow_cosmic_unicorn",
         "model": "Cosmic Unicorn",
     },
     {
-        "_id": "pimoroni-enviro",
+        "_id": "pimoroni-picow_enviro",
         "model": "Enviro",
     },
     {
-        "_id": "pimoroni-galactic_unicorn",
+        "_id": "pimoroni-picow_galactic_unicorn",
         "model": "Galactic Unicorn",
     },
     {
-        "_id": "pimoroni-inky_frame",
+        "_id": "pimoroni-picow_inky_frame",
         "model": "Inky Frame",
-    },
-    {
-        "_id": "pimoroni-stellar_unicorn",
-        "model": "Stellar Unicorn",
     },
     {
         "_id": "pimoroni-tiny2040",
@@ -209,7 +205,7 @@ add_defaults_and_downloads_to_variants(
         "info_url": "https://github.com/pimoroni/pimoroni-pico/releases",
         "_download_url_pattern": "https://github.com/pimoroni/pimoroni-pico/releases/download/v{version}/{id}-v{version}-micropython.uf2",
     },
-    ["1.21.0", "1.20.6"],
+    ["1.20.2", "1.19.18"],
     pimoroni_variants,
 )
 
@@ -223,34 +219,22 @@ all_variants += pimoroni_variants
 ########################################################
 pololu_variants = [
     {
-        "vendor": "Pololu",
+        "_id": "pololu-3pi-2040-robot",
         "model": "3pi+ 2040 Robot",
-        "family": "rp2",
-        "info_url": "https://github.com/pololu/micropython-build/releases/",
-        "downloads": [
-            {
-                "version": "231113",
-                "url": "https://github.com/pololu/micropython-build/releases/download/231113/micropython-pololu-3pi-2040-robot-v1.22.0-preview-231113.uf2"
-            },
-            {
-                "version": "230510",
-                "url": "https://github.com/pololu/micropython-build/releases/download/230510/micropython-pololu-3pi-2040-robot-v1.20.0-230510.uf2"
-            },
-        ]
-    },
-    {
-        "vendor": "Pololu",
-        "model": "Zumo 2040 Robot",
-        "family": "rp2",
-        "info_url": "https://github.com/pololu/micropython-build/releases/",
-        "downloads": [
-            {
-                "version": "231113",
-                "url": "https://github.com/pololu/micropython-build/releases/download/231113/micropython-pololu-zumo-2040-robot-v1.22.0-preview-231113.uf2"
-            },
-        ]
     },
 ]
+
+print(f"Updating {len(pololu_variants)} Pololu variants")
+add_defaults_and_downloads_to_variants(
+    {
+        "vendor": "Pololu",
+        "family": "rp2",
+        "info_url": "https://github.com/pololu/micropython-build/releases/",
+        "_download_url_pattern": "https://github.com/pololu/micropython-build/releases/download/{version}/micropython-{id}-v1.20.0-{version}.uf2",
+    },
+    ["230510"],
+    pololu_variants,
+)
 
 all_variants += pololu_variants
 
@@ -281,10 +265,6 @@ simplified_microbits = [
         "family": "nrf52",
         "info_url": "https://github.com/microbit-foundation/micropython-microbit-v2/releases/",
         "downloads": [
-            {
-                "version": "2.1.2",
-                "url": "https://github.com/microbit-foundation/micropython-microbit-v2/releases/download/v2.1.2/micropython-microbit-v2.1.2.hex",
-            },
             {
                 "version": "2.1.1",
                 "url": "https://github.com/microbit-foundation/micropython-microbit-v2/releases/download/v2.1.1/micropython-microbit-v2.1.1.hex",

@@ -2012,3 +2012,26 @@ msgstr "Warne wenn ein benutzerdefiniertes Modul ein Bibliotheksmodul unzugängl
 msgid "Search micropython-lib and PyPI"
 msgstr "Suche micropython-lib und PyPI"
 
+#: thonny/plugins/assistantGPT_config_page.py:43
+msgid "File with API key from the OpenAI platform"
+msgstr "Datei mit API-Key von openAI Plattform"
+
+#: thonny/plugins/assistantGPT_config_page.py:68
+msgid "File with system prompt for API response"
+msgstr "Datei mit Systemprompt für API Antwort"
+
+#: thonny/plugins/assistantGPT_config_page.py:95
+msgid ""
+"The model 'gpt-4o-mini-2024-07-18' is used with the following parameters:"
+"\n"
+"- temperature = 0.7 (Creativity of responses)\n"
+"- top_p = 0.7 (Probability control)\n"
+"- max_tokens = 150 (Limits the maximum response length)\n"
+"- frequency_penalty = 0.6 (Reduces repetitions in responses)"
+msgstr ""
+"Es wird das Modell 'gpt-4o-mini-2024-07-18' mit folgenden Parametern verwendet:"
+"\n"
+"- temperature = 0.7 (Kreativität der Antworten)\n"
+"- top_p = 0.7 (Wahrscheinlichkeitssteuerung)\n"
+"- max_tokens = 150 (Begrenzung der maximalen Antwortlänge)\n"
+"- frequency_penalty = 0.6 (Verringert Wiederholungen in den Antworten)"

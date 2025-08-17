@@ -3,7 +3,7 @@
 """Code for maintaining the background process and for running
 user programs
 
-Commands get executed via shell, this way the command line in the 
+Commands get executed via shell, this way the command line in the
 shell becomes kind of title for the execution.
 
 """
@@ -887,12 +887,10 @@ class BackendProxy(ABC):
         ...
 
     @abstractmethod
-    def is_connected(self):
-        ...
+    def is_connected(self): ...
 
     @abstractmethod
-    def has_local_interpreter(self):
-        ...
+    def has_local_interpreter(self): ...
 
     @abstractmethod
     def get_target_executable(self) -> Optional[str]:
@@ -933,8 +931,7 @@ class BackendProxy(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def can_debug(self) -> bool:
-        ...
+    def can_debug(self) -> bool: ...
 
     def ready_for_remote_file_operations(self):
         return False
@@ -960,8 +957,7 @@ class BackendProxy(ABC):
         """
 
     @abstractmethod
-    def can_run_in_terminal(self) -> bool:
-        ...
+    def can_run_in_terminal(self) -> bool: ...
 
     def run_script_in_terminal(self, script_path, args, interactive, keep_open):
         raise NotImplementedError()
@@ -1046,8 +1042,6 @@ class SubprocessProxy(BackendProxy, ABC):
         # because cmd line option -u won't reach child processes
         # see https://github.com/thonny/thonny/issues/808
         env["PYTHONUNBUFFERED"] = "1"
-
-        env["PYTHONSAFEPATH"] = "1"
 
         # Let back-end know about plug-ins
         env["THONNY_USER_DIR"] = THONNY_USER_DIR
@@ -1310,7 +1304,7 @@ class SubprocessProxy(BackendProxy, ABC):
         return self._exe_dirs
 
     def can_be_isolated(self) -> bool:
-        """Says whether the backend may be launched with -s switch"""
+        """Says whether the backend may be launched with -I switch"""
         return True
 
     def fetch_next_message(self):

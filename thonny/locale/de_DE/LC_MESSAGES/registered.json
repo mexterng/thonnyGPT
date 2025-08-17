@@ -463,5 +463,6 @@
     "to locate requirements.txt file and install the packages specified in it.": "Finde die requirements.txt Datei zu finden und die in Ihr spezifizierten Pakete zu installieren.",
     "total space": "Speicherplatz total",
     "unclosed_string": "offene_Zeichenfolge",
-    "used space": "benutzter Speicherplatz"
+    "used space": "benutzter Speicherplatz",
+    "key file with API key from the OpenAI platform": ".key Datei mit API-Key von OpenAI"
 }

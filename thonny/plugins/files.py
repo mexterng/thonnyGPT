@@ -232,11 +232,8 @@ class ActiveLocalFileBrowser(BaseLocalFileBrowser):
         super().add_middle_menu_items(context)
 
     def _get_venv_path(self):
-        path = self.get_selected_path()
-        if not path:
-            return None
-
         CFGFILE = "pyvenv.cfg"
+        path = self.get_selected_path()
         fnam = self.get_selected_name()
         try:
             if os.path.exists(path):
@@ -247,11 +244,8 @@ class ActiveLocalFileBrowser(BaseLocalFileBrowser):
                 else:
                     if fnam == CFGFILE:
                         return os.path.dirname(path)
-        except Exception:
-            import traceback
-
-            traceback.print_stack()
-            logger.exception("_get_venv_path")
+        except Exception as ex:
+            logger.error("_get_venv_path", ex)
 
     def check_for_venv(self):
         return self._get_venv_path() is not None

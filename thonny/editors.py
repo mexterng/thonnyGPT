@@ -6,7 +6,7 @@ import tkinter as tk
 import traceback
 from logging import exception, getLogger
 from tkinter import messagebox, simpledialog, ttk
-from typing import Optional, Union
+from typing import Optional
 
 from _tkinter import TclError
 
@@ -24,7 +24,6 @@ from thonny.common import (
     normpath_with_actual_case,
     universal_dirname,
 )
-from thonny.custom_notebook import CustomNotebook, CustomNotebookTab
 from thonny.languages import tr
 from thonny.misc_utils import running_on_mac_os, running_on_windows
 from thonny.tktextext import rebind_control_a
@@ -61,10 +60,11 @@ class Editor(ttk.Frame):
     def __init__(self, master):
         ttk.Frame.__init__(self, master)
         assert isinstance(master, EditorNotebook)
-        self.containing_notebook = master  # type: EditorNotebook
+        self.notebook = master  # type: EditorNotebook
 
+        # parent of codeview will be workbench so that it can be maximized
         self._code_view = CodeView(
-            self,
+            get_workbench(),
             propose_remove_line_numbers=True,
             font="EditorFont",
             text_class=EditorCodeViewText,
@@ -75,6 +75,8 @@ class Editor(ttk.Frame):
         )
 
         self._code_view.grid(row=0, column=0, sticky=tk.NSEW, in_=self)
+        self._code_view.home_widget = self  # don't forget home
+        self.maximizable_widget = self._code_view
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
@@ -222,8 +224,8 @@ class Editor(ttk.Frame):
                 master=self,
             )
             return False
-
         self.update_appearance()
+
         return True
 
     def _load_local_file(self, filename, keep_undo=False):
@@ -288,7 +290,7 @@ class Editor(ttk.Frame):
             if not save_filename:
                 return None
 
-            if self.containing_notebook.get_editor(save_filename) is not None:
+            if self.notebook.get_editor(save_filename) is not None:
                 messagebox.showerror(
                     tr("File is open"),
                     tr(
@@ -562,13 +564,11 @@ class Editor(ttk.Frame):
     def update_title(self):
         try:
             self.master.update_editor_title(self)
-        except Exception:
-            logger.exception("Could not update editor title")
+        except Exception as e:
+            logger.exception("Could not update editor title", exc_info=e)
 
     def _on_text_change(self, event):
-        # may not be added to the Notebook yet
-        if self.containing_notebook.has_content(self):
-            self.update_title()
+        self.update_title()
 
     def destroy(self):
         get_workbench().unbind("DebuggerResponse", self._listen_debugger_progress)
@@ -597,13 +597,13 @@ class Editor(ttk.Frame):
         return path
 
 
-class EditorNotebook(CustomNotebook):
+class EditorNotebook(ui_utils.ClosableNotebook):
     """
     Manages opened files / modules
     """
 
     def __init__(self, master):
-        super().__init__(master)
+        super().__init__(master, padding=0)
 
         get_workbench().set_default("file.reopen_all_files", False)
         get_workbench().set_default("file.open_files", [])
@@ -639,8 +639,13 @@ class EditorNotebook(CustomNotebook):
         self.bind("<<NotebookTabChanged>>", self.on_tab_changed, True)
 
     def on_tab_changed(self, *args):
-        # Required to avoid incorrect sizing of parent panes
-        self.update_idletasks()
+        if sys.platform == "darwin":
+            # Since Tk 8.6.11, after closing an editor, the previous editor re-appeared with
+            # widgets disappeared, at least on Aivar's machine.
+            for child in self.get_all_editors():
+                assert isinstance(child, Editor)
+                child.get_code_view().grid_main_widgets()
+            self.update_idletasks()
 
     def _init_commands(self):
         # TODO: do these commands have to be in EditorNotebook ??
@@ -904,24 +909,23 @@ class EditorNotebook(CustomNotebook):
                 continue
             else:
                 editor = self.get_child_by_index(tab_index)
-                self.close_editor(editor, force=False)
+                if self.check_allow_closing(editor):
+                    self.forget(editor)
+                    editor.destroy()
 
     def _cmd_close_file(self):
         self.close_tab(self.index(self.select()))
 
-    def close_tab(self, index_or_tab: Union[int, CustomNotebookTab]):
-        if isinstance(index_or_tab, int):
-            page = self.pages[index_or_tab]
-        else:
-            page = self.get_page_by_tab(index_or_tab)
+    def close_tab(self, index):
+        editor = self.get_child_by_index(index)
 
-        assert isinstance(page.content, Editor)
-        self.close_editor(page.content)
+        if editor:
+            self.close_editor(editor)
 
     def close_editor(self, editor, force=False):
         if not force and not self.check_allow_closing(editor):
             return
-        self._forget(editor)
+        self.forget(editor)
         editor.destroy()
 
     def _cmd_save_file(self):

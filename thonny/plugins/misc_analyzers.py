@@ -3,6 +3,8 @@ from logging import getLogger
 
 from thonny import get_runner
 from thonny.assistance import ProgramAnalyzer, add_program_analyzer
+from thonny.assistanceGPT import ProgramAnalyzer as ProgramAnalyzerGPT
+from thonny.assistanceGPT import add_program_analyzer as add_program_analyzer_GPT
 from thonny.common import is_same_path
 
 logger = getLogger(__name__)
@@ -295,5 +297,79 @@ class ProgramNamingAnalyzer(ProgramAnalyzer):
         return result
 
 
+class ProgramNamingAnalyzerGPT(ProgramAnalyzerGPT):
+    def start_analysis(self, main_file_path, imported_file_paths):
+        self.completion_handler(self, list(self._get_warnings(main_file_path)))
+
+    def _get_warnings(self, main_file_path):
+        from thonny import rst_utils
+
+        # TODO: current dir may be different
+        main_file_dir = os.path.dirname(main_file_path)
+        if not os.path.isdir(main_file_dir):
+            return
+
+        library_modules = known_stdlib_modules | self._get_3rd_party_modules()
+
+        for item in os.listdir(main_file_dir):
+            full_path = os.path.join(main_file_dir, item)
+            if item.endswith(".py") and item[:-3] in library_modules:
+                if is_same_path(full_path, main_file_path):
+                    prelude = "Your program file is named '%s'." % item
+                    rename_hint = " (*File → Rename…* )"
+                else:
+                    prelude = (
+                        "Your working directory `%s <%s>`__ contains a file named '%s'.\n\n"
+                        % (rst_utils.escape(main_file_dir), rst_utils.escape(main_file_dir), item)
+                    )
+                    rename_hint = ""
+
+                yield {
+                    "filename": full_path,
+                    "lineno": 0,
+                    "symbol": "file-shadows-library-module",
+                    "msg": "Possibly bad file name",
+                    "explanation_rst": prelude
+                    + "\n\n"
+                    + "When you try to import library module ``%s``, your file will be imported instead.\n\n"
+                    % item[:-3]
+                    + "Rename your '%s'%s to make the library module visible again."
+                    % (item, rename_hint),
+                    "group": "warnings",
+                    "relevance": 5,
+                }
+
+    def _get_3rd_party_modules(self):
+        proxy = get_runner().get_backend_proxy()
+        from thonny.plugins.cpython_frontend import LocalCPythonProxy
+
+        if not isinstance(proxy, LocalCPythonProxy):
+            return []
+
+        try:
+            sys_path = proxy.get_sys_path()
+        except Exception:
+            logger.exception("Can't get sys path from proxy")
+            return []
+
+        module_names = set()
+        for item in sys_path:
+            if os.path.isdir(item) and ("site-packages" in item or "dist-packages" in item):
+                module_names.update(self._get_module_names(item))
+                for name in os.listdir(item):
+                    if "-" not in name:
+                        module_names.add(name.replace(".py", ""))
+
+        return module_names
+
+    def _get_module_names(self, dir_path):
+        result = set()
+        for name in os.listdir(dir_path):
+            if "-" not in name:
+                result.add(name.replace(".py", ""))
+        return result
+
+
 def load_plugin():
     add_program_analyzer(ProgramNamingAnalyzer)
+    add_program_analyzer_GPT(ProgramNamingAnalyzerGPT)

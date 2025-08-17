@@ -60,7 +60,6 @@ def find_download_links(
         url = item["url"]
         response = requests.head(url)
         if response.status_code not in [200, 302]:
-            #print(f"Got {response.status_code} when downloading {url}")
             raise RuntimeError(f"Got {response.status_code} when downloading {url}")
 
     return stables + unstables
@@ -97,7 +96,7 @@ _page_cache = {}
 
 def read_page(url) -> str:
     if url not in _page_cache:
-        response = requests.get(url, headers={'Accept-Encoding': 'gzip'})
+        response = requests.get(url)
         if response.status_code != 200:
             raise RuntimeError(f"Status {response.status_code} for {url}")
         _page_cache[url] = response.text

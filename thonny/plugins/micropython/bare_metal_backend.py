@@ -3,7 +3,6 @@ import os
 import re
 import struct
 import sys
-import textwrap
 import time
 from logging import getLogger
 from textwrap import dedent, indent
@@ -1061,22 +1060,6 @@ class BareMetalMicroPythonBackend(MicroPythonBackend, UploadDownloadMixin):
                     self._ensure_normal_mode(force=True)
             else:
                 source = cmd.source
-
-            if cmd.get("populate_argv", False):
-                # Let the program know that it runs via %Run
-                assert isinstance(cmd.args, list)
-                argv = cmd.args
-                argv_updater = textwrap.dedent(
-                    f"""
-                try:
-                    import sys as _thonny_sys
-                    _thonny_sys.argv[:] = {argv}
-                    del __thonny_sys
-                except:
-                    pass
-                """
-                ).strip()
-                self._execute(argv_updater, capture_output=False)
 
             self._execute(source, capture_output=False)
             if restart_interpreter_before_run:

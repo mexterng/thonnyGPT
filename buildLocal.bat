@@ -1,0 +1,24 @@
+@echo off
+@echo ----- clean build -----
+rd /s /q .\build
+call .\venv\Scripts\activate
+python setup.py clean --all
+pip install .
+
+@echo ---- build.bat -------
+pip install -r requirements.txt
+python -m isort thonny
+python -m black thonny
+
+
+@echo --- copy_libs.bat ----- not neccassary
+xcopy ..\pipkin\pipkin\*.py thonny\vendored_libs\pipkin /s /e
+pip install filelock==3.8.* -t thonny\vendored_libs
+
+
+@echo --- setup.py -----
+python setup.py build
+
+
+
+
