@@ -1,3 +1,28 @@
+===============================
+Thonny ChatGPT Edition (Fork)
+===============================
+
+Dies ist ein Fork von Thonny Version 4.1.4, erweitert durch die Integration 
+eines ChatGPT-Fensters. 
+
+Vorteile dieser Erweiterung:
+---------
+- Direkter Zugriff auf Code durch Verwendung der OpenAI API
+- Möglichkeit, Rollen-Anweisungen (Prompts) gezielt mitzugeben
+- Unterstützt den Einsatz in Bildung und Lehre
+
+Anwendungsfälle:
+---------
+- Schule
+- Python-Programmieren lernen
+- IT- und Informatik-Unterricht
+
+Hinweis: Dieses Projekt basiert auf Thonny (https://github.com/thonny/thonny), 
+erstellt von Aivar Annamaa. Die Lizenz (MIT) des Originalprojekts bleibt bestehen. 
+Erweiterungen in diesem Fork stehen ebenfalls unter MIT-Lizenz.
+
+----
+
 .. image:: https://github.com/thonny/thonny/blob/master/thonny/res/Ukraine.png
 
 `Support Ukraine! <https://github.com/thonny/thonny/wiki/Support-Ukraine>`_
